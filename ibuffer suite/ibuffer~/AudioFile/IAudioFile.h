@@ -37,6 +37,7 @@ namespace HISSTools
             // File Open / Close
             
             void open(const std::string& i);
+            void openRaw(const std::string& i);
             void close();
             bool isOpen();
             

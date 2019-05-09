@@ -44,6 +44,20 @@ namespace HISSTools
             }
         }
 
+        void IAudioFile::openRaw(const std::string& i) 
+        {
+            close();
+
+            if (!i.empty())
+            {
+                mFile.open(i.c_str(), std::ios_base::binary);
+                // Do Header Shit
+                parseDataHeader();
+                mBuffer = new char[WORK_LOOP_SIZE * getFrameByteCount()];
+                seek();
+            }
+        }
+
         void IAudioFile::close()
         {
             mFile.close();
@@ -400,6 +414,34 @@ namespace HISSTools
             // No known format found
 
             setErrorBit(ERR_FILE_UNKNOWN_FORMAT);
+        }
+
+        void IAudioFile::parseDataHeader(const char* fileType)
+        {
+            char chunk[16];
+            uint32_t chunkSize;
+
+            setHeaderEndianness(kAudioFileBigEndian);
+            setAudioEndianness(kAudioFileBigEndian);
+            
+            // NumberFormat format
+            // = getU16(chunk + 0, getHeaderEndianness()) == 0x0003
+            // ? kAudioFileFloat
+            // : kAudioFileInt;
+            // setChannels(getU16(chunk + 2, getHeaderEndianness()));
+            // setSamplingRate(getU32(chunk + 4, getHeaderEndianness()));
+            // uint16_t bitDepth = getU16(chunk + 14, getHeaderEndianness());
+
+            NumberFormat format = kAudioFileInt; 
+            
+            // Set PCM Format
+            
+            setPCMFormat(bitDepth, format);
+
+            
+            setFrames(chunkSize / getFrameByteCount());
+            setPCMOffset(positionInternal());
+            setFileType(kAudioFileNone);
         }
 
         void IAudioFile::parseAIFFHeader(const char* fileSubtype)
