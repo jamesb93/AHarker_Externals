@@ -188,6 +188,13 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXContainerItemProxy section */
+		268A29BC22842E4300F8D5B2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 268A298522842E4300F8D5B2 /* rawbuf~.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B1BB1FD90A4ECF4A0012288F;
+			remoteInfo = "ibuffer~";
+		};
 		B80B8FC2183BCC730014C9C4 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = B82F0FA31465F7F4007FAC6A /* - vMSP~.xcodeproj */;
@@ -1101,6 +1108,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		268A298522842E4300F8D5B2 /* rawbuf~.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "rawbuf~.xcodeproj"; path = "ibuffer suite/rawbuf~/rawbuf~.xcodeproj"; sourceTree = "<group>"; };
 		B80B910B183BCE880014C9C4 /* denormkiller~.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "denormkiller~.xcodeproj"; path = "utility/denormkiller~/denormkiller~.xcodeproj"; sourceTree = "<group>"; };
 		B80B91AD183BD1370014C9C4 /* randfloats.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = randfloats.xcodeproj; path = "random numbers/randfloats/randfloats.xcodeproj"; sourceTree = "<group>"; };
 		B82F0DC01465F0BC007FAC6A /* valconvert.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = valconvert.xcodeproj; path = conversion/valconvert/valconvert.xcodeproj; sourceTree = "<group>"; };
@@ -1160,6 +1168,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		268A298622842E4300F8D5B2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				268A29BD22842E4300F8D5B2 /* ibuffer~.mxo */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		B80B8F9C183BCC730014C9C4 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -1512,6 +1528,7 @@
 		B82F0DFA1465F13E007FAC6A /* ibuffer suite */ = {
 			isa = PBXGroup;
 			children = (
+				268A298522842E4300F8D5B2 /* rawbuf~.xcodeproj */,
 				B82F0DFD1465F151007FAC6A /* ibufconcatenate~.xcodeproj */,
 				B82F0E0D1465F164007FAC6A /* ibuffer~.xcodeproj */,
 				B82F0E161465F16D007FAC6A /* ibuffermulti~.xcodeproj */,
@@ -1792,6 +1809,10 @@
 					ProjectRef = B82F0E8A1465F316007FAC6A /* randomvals~.xcodeproj */;
 				},
 				{
+					ProductGroup = 268A298622842E4300F8D5B2 /* Products */;
+					ProjectRef = 268A298522842E4300F8D5B2 /* rawbuf~.xcodeproj */;
+				},
+				{
 					ProductGroup = B80B94E1183BD9950014C9C4 /* Products */;
 					ProjectRef = B82F0EFC1465F573007FAC6A /* rbiquad~.xcodeproj */;
 				},
@@ -1864,6 +1885,13 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		268A29BD22842E4300F8D5B2 /* ibuffer~.mxo */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "ibuffer~.mxo";
+			remoteRef = 268A29BC22842E4300F8D5B2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		B80B8FC3183BCC730014C9C4 /* vabs~.mxo */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
