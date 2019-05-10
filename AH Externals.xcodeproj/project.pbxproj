@@ -175,7 +175,6 @@
 			);
 			dependencies = (
 				B80B95CD183BDBFE0014C9C4 /* PBXTargetDependency */,
-				B80B95CF183BDC1B0014C9C4 /* PBXTargetDependency */,
 				B80B95D1183BDC240014C9C4 /* PBXTargetDependency */,
 				B80B95D3183BDC3D0014C9C4 /* PBXTargetDependency */,
 				B80B95D5183BDC550014C9C4 /* PBXTargetDependency */,
@@ -188,11 +187,11 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXContainerItemProxy section */
-		268A29BC22842E4300F8D5B2 /* PBXContainerItemProxy */ = {
+		268A29DA22849FF400F8D5B2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 268A298522842E4300F8D5B2 /* rawbuf~.xcodeproj */;
+			containerPortal = 268A29D622849FF400F8D5B2 /* ibuffer~.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = B1BB1FD90A4ECF4A0012288F;
+			remoteGlobalIDString = 268A29D022842E6B00F8D5B2;
 			remoteInfo = "ibuffer~";
 		};
 		B80B8FC2183BCC730014C9C4 /* PBXContainerItemProxy */ = {
@@ -923,13 +922,6 @@
 			remoteGlobalIDString = B88E3A8E11CE729300FD3E96;
 			remoteInfo = "ibufconcatedrive~";
 		};
-		B80B959F183BDBB60014C9C4 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = B82F0E0D1465F164007FAC6A /* ibuffer~.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = B1BB1FD90A4ECF4A0012288F;
-			remoteInfo = "ibuffer~";
-		};
 		B80B95A7183BDBC10014C9C4 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = B82F0E161465F16D007FAC6A /* ibuffermulti~.xcodeproj */;
@@ -971,13 +963,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = B88E3A9711CE72A000FD3E96;
 			remoteInfo = All;
-		};
-		B80B95CE183BDC1B0014C9C4 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = B82F0E0D1465F164007FAC6A /* ibuffer~.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 8D01CCC60486CAD60068D4B7;
-			remoteInfo = "ibuffer~";
 		};
 		B80B95D0183BDC240014C9C4 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1108,12 +1093,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		268A298522842E4300F8D5B2 /* rawbuf~.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "rawbuf~.xcodeproj"; path = "ibuffer suite/rawbuf~/rawbuf~.xcodeproj"; sourceTree = "<group>"; };
+		268A29D622849FF400F8D5B2 /* ibuffer~.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "ibuffer~.xcodeproj"; path = "ibuffer suite/ibuffer~/ibuffer~.xcodeproj"; sourceTree = "<group>"; };
 		B80B910B183BCE880014C9C4 /* denormkiller~.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "denormkiller~.xcodeproj"; path = "utility/denormkiller~/denormkiller~.xcodeproj"; sourceTree = "<group>"; };
 		B80B91AD183BD1370014C9C4 /* randfloats.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = randfloats.xcodeproj; path = "random numbers/randfloats/randfloats.xcodeproj"; sourceTree = "<group>"; };
 		B82F0DC01465F0BC007FAC6A /* valconvert.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = valconvert.xcodeproj; path = conversion/valconvert/valconvert.xcodeproj; sourceTree = "<group>"; };
 		B82F0DFD1465F151007FAC6A /* ibufconcatenate~.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "ibufconcatenate~.xcodeproj"; path = "ibuffer suite/ibufconcatenate~/ibufconcatenate~.xcodeproj"; sourceTree = "<group>"; };
-		B82F0E0D1465F164007FAC6A /* ibuffer~.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "ibuffer~.xcodeproj"; path = "ibuffer suite/ibuffer~/ibuffer~.xcodeproj"; sourceTree = "<group>"; };
 		B82F0E161465F16D007FAC6A /* ibuffermulti~.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "ibuffermulti~.xcodeproj"; path = "ibuffer suite/ibuffermulti~/ibuffermulti~.xcodeproj"; sourceTree = "<group>"; };
 		B82F0E1F1465F173007FAC6A /* ibufinfo~.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "ibufinfo~.xcodeproj"; path = "ibuffer suite/ibufinfo~/ibufinfo~.xcodeproj"; sourceTree = "<group>"; };
 		B82F0E281465F178007FAC6A /* ibufmultitable~.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "ibufmultitable~.xcodeproj"; path = "ibuffer suite/ibufmultitable~/ibufmultitable~.xcodeproj"; sourceTree = "<group>"; };
@@ -1168,10 +1152,10 @@
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
-		268A298622842E4300F8D5B2 /* Products */ = {
+		268A29D722849FF400F8D5B2 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				268A29BD22842E4300F8D5B2 /* ibuffer~.mxo */,
+				268A29DB22849FF400F8D5B2 /* ibuffer~.mxo */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1469,14 +1453,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		B80B959C183BDBB60014C9C4 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				B80B95A0183BDBB60014C9C4 /* ibuffer~.mxo */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		B80B95A4183BDBC10014C9C4 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -1528,9 +1504,8 @@
 		B82F0DFA1465F13E007FAC6A /* ibuffer suite */ = {
 			isa = PBXGroup;
 			children = (
-				268A298522842E4300F8D5B2 /* rawbuf~.xcodeproj */,
+				268A29D622849FF400F8D5B2 /* ibuffer~.xcodeproj */,
 				B82F0DFD1465F151007FAC6A /* ibufconcatenate~.xcodeproj */,
-				B82F0E0D1465F164007FAC6A /* ibuffer~.xcodeproj */,
 				B82F0E161465F16D007FAC6A /* ibuffermulti~.xcodeproj */,
 				B82F0E1F1465F173007FAC6A /* ibufinfo~.xcodeproj */,
 				B82F0E281465F178007FAC6A /* ibufmultitable~.xcodeproj */,
@@ -1765,8 +1740,8 @@
 					ProjectRef = B82F0E161465F16D007FAC6A /* ibuffermulti~.xcodeproj */;
 				},
 				{
-					ProductGroup = B80B959C183BDBB60014C9C4 /* Products */;
-					ProjectRef = B82F0E0D1465F164007FAC6A /* ibuffer~.xcodeproj */;
+					ProductGroup = 268A29D722849FF400F8D5B2 /* Products */;
+					ProjectRef = 268A29D622849FF400F8D5B2 /* ibuffer~.xcodeproj */;
 				},
 				{
 					ProductGroup = B80B95AD183BDBCE0014C9C4 /* Products */;
@@ -1807,10 +1782,6 @@
 				{
 					ProductGroup = B80B9196183BD1170014C9C4 /* Products */;
 					ProjectRef = B82F0E8A1465F316007FAC6A /* randomvals~.xcodeproj */;
-				},
-				{
-					ProductGroup = 268A298622842E4300F8D5B2 /* Products */;
-					ProjectRef = 268A298522842E4300F8D5B2 /* rawbuf~.xcodeproj */;
 				},
 				{
 					ProductGroup = B80B94E1183BD9950014C9C4 /* Products */;
@@ -1885,11 +1856,11 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		268A29BD22842E4300F8D5B2 /* ibuffer~.mxo */ = {
+		268A29DB22849FF400F8D5B2 /* ibuffer~.mxo */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
 			path = "ibuffer~.mxo";
-			remoteRef = 268A29BC22842E4300F8D5B2 /* PBXContainerItemProxy */;
+			remoteRef = 268A29DA22849FF400F8D5B2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		B80B8FC3183BCC730014C9C4 /* vabs~.mxo */ = {
@@ -2424,13 +2395,6 @@
 			remoteRef = B80B9597183BDBAE0014C9C4 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		B80B95A0183BDBB60014C9C4 /* ibuffer~.mxo */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = "ibuffer~.mxo";
-			remoteRef = B80B959F183BDBB60014C9C4 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		B80B95A8183BDBC10014C9C4 /* ibuffermulti~.mxo */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
@@ -2613,11 +2577,6 @@
 			isa = PBXTargetDependency;
 			name = All;
 			targetProxy = B80B95CC183BDBFE0014C9C4 /* PBXContainerItemProxy */;
-		};
-		B80B95CF183BDC1B0014C9C4 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = "ibuffer~";
-			targetProxy = B80B95CE183BDC1B0014C9C4 /* PBXContainerItemProxy */;
 		};
 		B80B95D1183BDC240014C9C4 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

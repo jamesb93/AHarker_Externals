@@ -102,6 +102,7 @@ namespace HISSTools
             void parseHeader();
             void parseAIFFHeader(const char* fileSubtype);
             void parseWaveHeader(const char* fileType);
+            void parseDataHeader(std::streampos fileSize);
 
             //  Internal Typed Audio Read
             

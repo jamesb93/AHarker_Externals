@@ -1,18 +1,3 @@
-
-/*
- *  ibuffer~
- *
- *	ibuffer~ is an audio file buffer that loads audio files in their stored integer format (or float format if relevant).
- *
- *	This object is designed primarily for applications with large memory requirements where loading in 16 bit or 24 bit formats saves vital space in memory.
- *	It supports 16, 24 and 32 integer formats, as well as 32 bit float and can load either all channels or specified channels.
- *	There are a corresponding set of playback and other objects that will also function with standard MSP buffers.
- *
- *  Copyright 2010 Alex Harker. All rights reserved.
- *
- */
-
-
 #include <ext.h>
 #include <ext_obex.h>
 #include <z_dsp.h>
@@ -21,10 +6,9 @@
 
 #include <AH_Atomic.h>
 #include <ibuffer.h>
-
+#include <iostream>
 
 t_class *this_class;
-
 
 void *ibuffer_new(t_symbol *name, t_symbol *path_sym);
 void ibuffer_name(t_ibuffer *x, t_symbol *s, short argc, t_atom *argv);
@@ -36,10 +20,10 @@ void ibuffer_name(t_ibuffer *x, t_symbol *s, short argc, t_atom *argv);
 void *ibuffer_valid(t_ibuffer *x);
 void ibuffer_load(t_ibuffer *x, t_symbol *s, short argc, t_atom *argv);
 void ibuffer_doload(t_ibuffer *x, t_symbol *s, short argc, t_atom *argv);
-
+void ibuffer_rawload(t_ibuffer *x, t_symbol *s, short argc, t_atom *argv);
+void ibuffer_dorawload(t_ibuffer *x, t_symbol *s, short argc, t_atom *argv);
 
 t_symbol *ps_null;
-
 
 int C74_EXPORT main()
 {
@@ -51,6 +35,7 @@ int C74_EXPORT main()
 	class_addmethod(this_class, (method)ibuffer_load, "replace", A_GIMME, 0);
 	class_addmethod(this_class, (method)ibuffer_valid, "valid", A_CANT, 0);
 	class_addmethod(this_class, (method)ibuffer_assist, "assist", A_CANT, 0);
+    class_addmethod(this_class, (method)ibuffer_rawload, "raw", A_GIMME, 0);
 	
 	class_dspinit(this_class);
 	class_register(CLASS_BOX, this_class);
@@ -60,23 +45,21 @@ int C74_EXPORT main()
 	return 0;
 }
 
-
 void *ibuffer_new(t_symbol *name, t_symbol *path_sym)
 {
 	t_atom temp_atom;
-	
+    post("You are using the custom version of ibuffer~");
     t_ibuffer *x = (t_ibuffer *) object_alloc(this_class);
 	
 	dsp_setup((t_pxobject *)x, 0);
-	
 	x->name = 0;
 	x->valid = 1;
 	x->thebuffer = NULL;
     x->samples = NULL;
 	x->frames = 0;
-	x->channels = 0;
-	x->format = 0;
-	x->sr = 0;
+    x->channels = 1;
+    x->format = PCM_INT_16;
+	x->sr = 44100;
 	x->inuse = 0;
 	
 	x->bang_out = bangout(x);
@@ -148,6 +131,12 @@ void ibuffer_load(t_ibuffer *x, t_symbol *s, short argc, t_atom *argv)
 {
 	if (argc)
 		defer(x, (method) ibuffer_doload, s, argc, argv);
+}
+
+void ibuffer_rawload(t_ibuffer *x, t_symbol *s, short argc, t_atom *argv)
+{
+    if (argc)
+        defer(x, (method) ibuffer_dorawload, s, argc, argv);
 }
 
 struct ibuffer_lock
@@ -254,7 +243,7 @@ void ibuffer_switch_endianness(t_ibuffer *x)
     }
 }
 
-void ibuffer_doload(t_ibuffer *x, t_symbol *s, short argc, t_atom *argv)
+void ibuffer_dorawload(t_ibuffer *x, t_symbol *s, short argc, t_atom *argv)
 {
     HISSTools::Utility::IAudioFile file;
     
@@ -281,11 +270,11 @@ void ibuffer_doload(t_ibuffer *x, t_symbol *s, short argc, t_atom *argv)
 		err |= path_nameconform(foldname, fullname, PATH_STYLE_NATIVE, PATH_TYPE_ABSOLUTE);
 		
 		// If we now how a valid filename and folder name copy the strings into a fullname in the correct format and try to open the file
-		
+
 		if (!err)
 		{
             form_os_name(filename, foldname, fullname);
-            file.open(fullname);
+            file.openRaw(fullname);
         }
 	}
     
@@ -297,36 +286,11 @@ void ibuffer_doload(t_ibuffer *x, t_symbol *s, short argc, t_atom *argv)
 	{
         // Load the format data and if we have a valid format load the sample
 
-		x->frames = file.getFrames();
-		x->channels = file.getChannels();
-        x->sr = file.getSamplingRate();
-    
-		switch (file.getPCMFormat())
-		{
-            case HISSTools::Utility::BaseAudioFile::kAudioFileInt16:    x->format = PCM_INT_16;    break;
-			case HISSTools::Utility::BaseAudioFile::kAudioFileInt24:    x->format = PCM_INT_24;    break;
-			case HISSTools::Utility::BaseAudioFile::kAudioFileInt32:    x->format = PCM_INT_32;    break;
-            case HISSTools::Utility::BaseAudioFile::kAudioFileFloat32:  x->format = PCM_FLOAT;     break;
-                
-            default:
-                object_error((t_object *) x, "ibuffer~: incorrect sample format");
-                return;
-		}
-
-		// Sort channels to load (assume all if channels_to_load is zero)
-		
-        std::vector<long> channel_order(argc);
-        
-		for (long i = 0; i < channel_order.size(); i++)
-        {
-			t_atom_long channel = atom_getlong(argv + i) - 1;
-            channel_order[i] = channel < 0 ? 0 : ((channel > x->channels - 1) ? x->channels - 1 : channel);
-        }
-		
-		// Free previous memory and allocate memory to store the sample
-		
-        long num_chans_to_load = channel_order.size() ? channel_order.size() : x->channels;
+        x->frames = file.getFrames();
+        std::cout << x->frames << "\n";
+        long num_chans_to_load = x->channels; // Will always be 1 anyway
         long sample_size = file.getByteDepth();
+        
         
 		free(x->thebuffer);
 		x->thebuffer = calloc(sample_size, (x->frames * num_chans_to_load + 64));
@@ -341,59 +305,154 @@ void ibuffer_doload(t_ibuffer *x, t_symbol *s, short argc, t_atom *argv)
 		}
 		
 		// Load the audio data raw and close the file
+        file.readRaw(x->samples, x->frames);
 		
-		if (!channel_order.size())
+        lock.destroy();
+		outlet_bang(x->bang_out);
+    }
+}
+
+void ibuffer_doload(t_ibuffer *x, t_symbol *s, short argc, t_atom *argv)
+{
+    HISSTools::Utility::IAudioFile file;
+    
+    // Get path
+    
+    if (argc)
+    {
+        char filename[2048];
+        char foldname[2048];
+        char fullname[2048];
+        
+        char null_char = 0;
+        
+        short path = 0;
+        t_fourcc type = 0;
+        
+        // Find the file and get the correct filename ss well as that of the enclosing folder (making sure the later is in slash style)
+        
+        strcpy(filename, atom_getsym(argv++)->s_name);
+        argc--;
+        
+        short err = locatefile_extended(filename, &path , &type, &type,-1);
+        err |= path_topathname(path, &null_char, foldname);
+        err |= path_nameconform(foldname, fullname, PATH_STYLE_NATIVE, PATH_TYPE_ABSOLUTE);
+        
+        // If we now how a valid filename and folder name copy the strings into a fullname in the correct format and try to open the file
+        
+        if (!err)
+        {
+            form_os_name(filename, foldname, fullname);
+            file.open(fullname);
+        }
+    }
+    
+    // Lock the ibuffer (automatically releases on return)
+    
+    ibuffer_lock lock(x, &file);
+    
+    if (file.isOpen())
+    {
+        // Load the format data and if we have a valid format load the sample
+        
+        x->frames = file.getFrames();
+        x->channels = file.getChannels();
+        x->sr = file.getSamplingRate();
+        
+        switch (file.getPCMFormat())
+        {
+            case HISSTools::Utility::BaseAudioFile::kAudioFileInt16:    x->format = PCM_INT_16;    break;
+            case HISSTools::Utility::BaseAudioFile::kAudioFileInt24:    x->format = PCM_INT_24;    break;
+            case HISSTools::Utility::BaseAudioFile::kAudioFileInt32:    x->format = PCM_INT_32;    break;
+            case HISSTools::Utility::BaseAudioFile::kAudioFileFloat32:  x->format = PCM_FLOAT;     break;
+                
+            default:
+                object_error((t_object *) x, "ibuffer~: incorrect sample format");
+                return;
+        }
+        
+        // Sort channels to load (assume all if channels_to_load is zero)
+        
+        std::vector<long> channel_order(argc);
+        
+        for (long i = 0; i < channel_order.size(); i++)
+        {
+            t_atom_long channel = atom_getlong(argv + i) - 1;
+            channel_order[i] = channel < 0 ? 0 : ((channel > x->channels - 1) ? x->channels - 1 : channel);
+        }
+        
+        // Free previous memory and allocate memory to store the sample
+        
+        long num_chans_to_load = channel_order.size() ? channel_order.size() : x->channels;
+        long sample_size = file.getByteDepth();
+        std::cout <<"Sample Size (file.getByteDepth():" << sample_size << "\n";
+        
+        free(x->thebuffer);
+        x->thebuffer = calloc(sample_size, (x->frames * num_chans_to_load + 64));
+        x->samples = (void *)((char *) x->thebuffer + (16 * sample_size));
+        
+        // Bail if no memory
+        
+        if (!x->thebuffer)
+        {
+            object_error((t_object *) x, "ibuffer~: could not allocate memory to load file");
+            return;
+        }
+        
+        // Load the audio data raw and close the file
+        
+        if (!channel_order.size())
             file.readRaw(x->samples, x->frames);
-		else 
-		{
+        else
+        {
             const static int default_work_chunk = 10000;
             
             // Here we load in chunks to some temporary memory and then copy out ony the relevant channels
-
+            
             UInt8 *data = (UInt8 *) x->samples;
-			UInt8 *load_temp = (UInt8 *) malloc(default_work_chunk * sample_size * x->channels);
-
+            UInt8 *load_temp = (UInt8 *) malloc(default_work_chunk * sample_size * x->channels);
             
-			if (!load_temp) 
-			{
-				object_error((t_object *) x, "ibuffer~: could not allocate memory to load file");
+            
+            if (!load_temp)
+            {
+                object_error((t_object *) x, "ibuffer~: could not allocate memory to load file");
                 return;
-			}
+            }
             
-			for (long i = 0; i < (x->frames + default_work_chunk + 1) / default_work_chunk; i++)
-			{				
-				// Read chunk
-				
-				t_ptr_int work_chunk = (i + 1) * default_work_chunk > x->frames ?  x->frames - (i * default_work_chunk) : default_work_chunk;
+            for (long i = 0; i < (x->frames + default_work_chunk + 1) / default_work_chunk; i++)
+            {
+                // Read chunk
+                
+                t_ptr_int work_chunk = (i + 1) * default_work_chunk > x->frames ?  x->frames - (i * default_work_chunk) : default_work_chunk;
                 file.readRaw(load_temp, work_chunk);
-				
-				// Copy channels
-				
+                
+                // Copy channels
+                
                 UInt8 *channels_swap = load_temp;
                 
-				for (long j = 0; j < work_chunk; j++, channels_swap += x->channels * sample_size)
-					for (long k = 0; k < channel_order.size(); k++, data += sample_size)
-						memcpy(data, channels_swap + (channel_order[k] * sample_size), sample_size);
-			}
-			
-			// Free temp memory and store relevant variables
-			
-			free(load_temp);
-			x->channels = channel_order.size();
-		}
-		
-		// If the samples are in the wrong endianness then reverse the byte order for each sample 
-		
+                for (long j = 0; j < work_chunk; j++, channels_swap += x->channels * sample_size)
+                    for (long k = 0; k < channel_order.size(); k++, data += sample_size)
+                        memcpy(data, channels_swap + (channel_order[k] * sample_size), sample_size);
+            }
+            
+            // Free temp memory and store relevant variables
+            
+            free(load_temp);
+            x->channels = channel_order.size();
+        }
+        
+        // If the samples are in the wrong endianness then reverse the byte order for each sample
+        
         if (file.getAudioEndianness() == HISSTools::Utility::BaseAudioFile::kAudioFileBigEndian)
             ibuffer_switch_endianness(x);
-		
-		// File is now loaded - destroy the lock and bang (must be in this order!)
-		
+        
+        // File is now loaded - destroy the lock and bang (must be in this order!)
+        
         lock.destroy();
-		outlet_bang(x->bang_out);		
-	}
-	else 
-	{
-		object_error((t_object *) x, "ibuffer~: could not find / open named file");
-	}
+        outlet_bang(x->bang_out);
+    }
+    else
+    {
+        object_error((t_object *) x, "ibuffer~: could not find / open named file");
+    }
 }

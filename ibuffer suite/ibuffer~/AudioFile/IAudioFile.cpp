@@ -3,6 +3,7 @@
 #include <cmath>
 #include <cassert>
 #include <vector>
+#include <iostream>
 
 #define WORK_LOOP_SIZE 1024
 
@@ -30,6 +31,23 @@ namespace HISSTools
         }
 
         // File Opening / Close
+
+        void IAudioFile::openRaw(const std::string& i)
+        {
+            close();
+            
+            if (!i.empty())
+            {
+                mFile.open(i.c_str(), std::ios_base::binary);
+                std::streampos startSize = mFile.tellg();
+                mFile.seekg(0, std::ios::end);
+                std::streampos fileSize = mFile.tellg() - startSize;
+                std::cout << fileSize << "\n";
+                parseDataHeader(fileSize);
+                mBuffer = new char[WORK_LOOP_SIZE * getFrameByteCount()];
+                seek();
+            }
+        }
         
         void IAudioFile::open(const std::string& i)
         {
@@ -39,20 +57,6 @@ namespace HISSTools
             {
                 mFile.open(i.c_str(), std::ios_base::binary);
                 parseHeader();
-                mBuffer = new char[WORK_LOOP_SIZE * getFrameByteCount()];
-                seek();
-            }
-        }
-
-        void IAudioFile::openRaw(const std::string& i) 
-        {
-            close();
-
-            if (!i.empty())
-            {
-                mFile.open(i.c_str(), std::ios_base::binary);
-                // Do Header Shit
-                parseDataHeader();
                 mBuffer = new char[WORK_LOOP_SIZE * getFrameByteCount()];
                 seek();
             }
@@ -412,36 +416,42 @@ namespace HISSTools
                 return parseWaveHeader(fileType);
 
             // No known format found
-
+            
             setErrorBit(ERR_FILE_UNKNOWN_FORMAT);
         }
-
-        void IAudioFile::parseDataHeader(const char* fileType)
+        
+        void IAudioFile::parseDataHeader(std::streampos fileSize)
         {
-            char chunk[16];
-            uint32_t chunkSize;
-
+            uint32_t chunkSize = fileSize;
+            
+            // Check endianness
+            
             setHeaderEndianness(kAudioFileBigEndian);
             setAudioEndianness(kAudioFileBigEndian);
             
-            // NumberFormat format
-            // = getU16(chunk + 0, getHeaderEndianness()) == 0x0003
-            // ? kAudioFileFloat
-            // : kAudioFileInt;
-            // setChannels(getU16(chunk + 2, getHeaderEndianness()));
-            // setSamplingRate(getU32(chunk + 4, getHeaderEndianness()));
-            // uint16_t bitDepth = getU16(chunk + 14, getHeaderEndianness());
-
-            NumberFormat format = kAudioFileInt; 
+            // Retrieve relevant data
+            
+            setChannels(1);
+            setSamplingRate(44100);
+            uint16_t bitDepth = 16;
+            
+            NumberFormat format = kAudioFileFloat;
             
             // Set PCM Format
             
             setPCMFormat(bitDepth, format);
-
-            
+            // Search for the data chunk and retrieve frame size and file offset
             setFrames(chunkSize / getFrameByteCount());
-            setPCMOffset(positionInternal());
-            setFileType(kAudioFileNone);
+            setPCMOffset(0);
+            setFileType(kAudioFileWAVE);
+            std::cout << "\n";
+            std::cout << "\n";
+            
+            std::cout << "Frames:" << getFrames() << "\n";
+            std::cout << "FrameByteCount:" << getFrameByteCount() << "\n";
+            std::cout << "Sample Rate:" << getSamplingRate() << "\n";
+            std::cout << "Channels:" << getChannels() << "\n";
+            std::cout << "Bit Depth:" << bitDepth << "\n";
         }
 
         void IAudioFile::parseAIFFHeader(const char* fileSubtype)
@@ -657,6 +667,15 @@ namespace HISSTools
             }
             
             setFrames(chunkSize / getFrameByteCount());
+            std::cout << "Chunk Size:" << chunkSize << "\n";
+            std::cout << "Frames:" << getFrames() << "\n";
+            std::cout << "FrameByteCount:" << getFrameByteCount() << "\n";
+            std::cout << "chunk + 2 (Channels):" << getU16(chunk + 2, getHeaderEndianness()) << "\n";
+            std::cout << "chunk + 4: (Sampling Rate)" << getU32(chunk + 4, getHeaderEndianness()) << "\n";
+            std::cout << "Internal Position:" << positionInternal() << "\n";
+            std::cout << "Bit Depth:" << bitDepth << "\n";
+            std::cout << "AudioType:" << format << "\n";
+            
             setPCMOffset(positionInternal());
             setFileType(kAudioFileWAVE);
         }
