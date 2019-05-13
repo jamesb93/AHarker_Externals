@@ -24,14 +24,14 @@ namespace HISSTools
         {
             open(i);
         }
-
+        
         IAudioFile::~IAudioFile()
         {
             close();
         }
-
+        
         // File Opening / Close
-
+        
         void IAudioFile::openRaw(const std::string& i)
         {
             close();
@@ -61,7 +61,7 @@ namespace HISSTools
                 seek();
             }
         }
-
+        
         void IAudioFile::close()
         {
             mFile.close();
@@ -72,19 +72,19 @@ namespace HISSTools
                 mBuffer = NULL;
             }
         }
-
+        
         bool IAudioFile::isOpen()
         {
             return mFile.is_open();
         }
         
         // File Position
-
+        
         void IAudioFile::seek(FrameCount position)
         {
             seekInternal(getPCMOffset() + getFrameByteCount() * position);
         }
-
+        
         IAudioFile::FrameCount IAudioFile::getPosition()
         {
             if (getPCMOffset())
@@ -123,14 +123,14 @@ namespace HISSTools
         }
         
         //  Internal File Handling
-
+        
         bool IAudioFile::readInternal(char* buffer,
-                                                    ByteCount numBytes)
+                                      ByteCount numBytes)
         {
             mFile.clear();
             mFile.read(buffer, numBytes);
             
-           return static_cast<ByteCount>(mFile.gcount()) == numBytes;
+            return static_cast<ByteCount>(mFile.gcount()) == numBytes;
         }
         
         bool IAudioFile::seekInternal(ByteCount position)
@@ -144,7 +144,7 @@ namespace HISSTools
         {
             return seekInternal(positionInternal() + offset);
         }
-
+        
         IAudioFile::ByteCount IAudioFile::positionInternal()
         {
             return mFile.tellg();
@@ -235,7 +235,7 @@ namespace HISSTools
             
             return value;
         }
-
+        
         template <class T>
         void IAudioFile::u32ToOutput(T* output, uint32_t value)
         {
@@ -255,13 +255,13 @@ namespace HISSTools
             *output = *reinterpret_cast<double*>(&value);
         }
         
-         //  Chunk Reading
+        //  Chunk Reading
         
         bool IAudioFile::matchTag(const char* a, const char* b)
         {
             return (strncmp(a, b, 4) == 0);
         }
-
+        
         bool IAudioFile::readChunkHeader(char* tag, uint32_t& chunkSize)
         {
             char header[8] = {};
@@ -273,7 +273,7 @@ namespace HISSTools
             
             return true;
         }
-
+        
         bool IAudioFile::findChunk(const char* searchTag, uint32_t& chunkSize)
         {
             char tag[4] = {};
@@ -302,7 +302,7 @@ namespace HISSTools
         }
         
         // PCM Format Helpers
-
+        
         IAudioFile::Error IAudioFile::findPCMFormat(uint16_t bitDepth,
                                                     NumberFormat format,
                                                     PCMFormat& ret)
@@ -340,7 +340,7 @@ namespace HISSTools
             }
             setErrorBit(error);
         }
-
+        
         // AIFF Helpers
         
         bool IAudioFile::getAIFFChunkHeader(AiffTag& enumeratedTag,
@@ -384,37 +384,37 @@ namespace HISSTools
         }
         
         //  Parse Headers
-
+        
         void IAudioFile::parseHeader()
         {
             char chunk[12] = {}, fileType[4] = {}, fileSubtype[4] = {};
-
+            
             // `Read file header
-
+            
             if (!readInternal(chunk, 12))
             {
                 setErrorBit(ERR_FILE_BAD_FORMAT);
                 return;
             }
-
+            
             // Get file type and subtype
-
+            
             strncpy(fileType, chunk, 4);
             strncpy(fileSubtype, chunk + 8, 4);
-
+            
             // AIFF or AIFC
-
+            
             if (matchTag(fileType, "FORM")
                 && (matchTag(fileSubtype, "AIFF")
                     || matchTag(fileSubtype, "AIFC")))
                 return parseAIFFHeader(fileSubtype);
-
+            
             // WAVE file format
-
+            
             if ((matchTag(fileType, "RIFF") || matchTag(fileType, "RIFX"))
                 && matchTag(fileSubtype, "WAVE"))
                 return parseWaveHeader(fileType);
-
+            
             // No known format found
             
             setErrorBit(ERR_FILE_UNKNOWN_FORMAT);
@@ -453,7 +453,7 @@ namespace HISSTools
             std::cout << "Channels:" << getChannels() << "\n";
             std::cout << "Bit Depth:" << bitDepth << "\n";
         }
-
+        
         void IAudioFile::parseAIFFHeader(const char* fileSubtype)
         {
             AiffTag tag;
@@ -679,9 +679,9 @@ namespace HISSTools
             setPCMOffset(positionInternal());
             setFileType(kAudioFileWAVE);
         }
-
+        
         //  Internal Typed Audio Read
-
+        
         template <class T>
         void IAudioFile::readAudio(T* output, FrameCount numFrames, int32_t channel)
         {
@@ -699,20 +699,20 @@ namespace HISSTools
                 FrameCount loopFrames = numFrames > WORK_LOOP_SIZE ? WORK_LOOP_SIZE : numFrames;
                 uintptr_t loopSamples = loopFrames * numChannels;
                 uintptr_t j = channel * byteDepth;
-
+                
                 // Read raw
-
+                
                 readRaw(mBuffer, loopFrames);
-
+                
                 // Move to Output
-
+                
                 switch (getPCMFormat())
                 {
                     case kAudioFileInt8:
                         for (uintptr_t i = 0; i < loopSamples; i++, j += byteStep)
                             u32ToOutput(output + i, mBuffer[j] << 24);
                         break;
-
+                        
                     case kAudioFileInt16:
                         for (uintptr_t i = 0; i < loopSamples; i++, j += byteStep)
                             u32ToOutput(
@@ -720,7 +720,7 @@ namespace HISSTools
                                         getU16(mBuffer + j, getAudioEndianness())
                                         << 16);
                         break;
-
+                        
                     case kAudioFileInt24:
                         for (uintptr_t i = 0; i < loopSamples; i++, j += byteStep)
                             u32ToOutput(
@@ -728,24 +728,24 @@ namespace HISSTools
                                         getU24(mBuffer + j, getAudioEndianness())
                                         << 8);
                         break;
-
-                case kAudioFileInt32:
-                    for (size_t i = 0; i < loopSamples; i++, j += byteStep)
-                        u32ToOutput(output + i, getU32(mBuffer + j,
-                                                       getAudioEndianness()));
-                    break;
-
-                case kAudioFileFloat32:
-                    for (size_t i = 0; i < loopSamples; i++, j += byteStep)
-                        float32ToOutput(output + i, getU32(mBuffer + j,
+                        
+                    case kAudioFileInt32:
+                        for (size_t i = 0; i < loopSamples; i++, j += byteStep)
+                            u32ToOutput(output + i, getU32(mBuffer + j,
                                                            getAudioEndianness()));
-                    break;
-
-                case kAudioFileFloat64:
-                    for (size_t i = 0; i < loopSamples; i++, j += byteStep)
-                        float64ToOutput(output + i, getU64(mBuffer + j,
-                                                           getAudioEndianness()));
-                    break;
+                        break;
+                        
+                    case kAudioFileFloat32:
+                        for (size_t i = 0; i < loopSamples; i++, j += byteStep)
+                            float32ToOutput(output + i, getU32(mBuffer + j,
+                                                               getAudioEndianness()));
+                        break;
+                        
+                    case kAudioFileFloat64:
+                        for (size_t i = 0; i < loopSamples; i++, j += byteStep)
+                            float64ToOutput(output + i, getU64(mBuffer + j,
+                                                               getAudioEndianness()));
+                        break;
                 }
                 
                 numFrames -= loopFrames;
@@ -754,3 +754,4 @@ namespace HISSTools
         }
     }
 }
+

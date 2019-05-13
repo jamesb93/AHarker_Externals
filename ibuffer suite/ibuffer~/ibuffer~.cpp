@@ -27,110 +27,110 @@ t_symbol *ps_null;
 
 int C74_EXPORT main()
 {
-	this_class = class_new ("ibuffer~", (method) ibuffer_new, (method)ibuffer_free, (short)sizeof(t_ibuffer), 0L, A_DEFSYM, A_DEFSYM, 0);
-	
-	class_addmethod(this_class, (method)ibuffer_name, "name", A_GIMME, 0);
-	class_addmethod(this_class, (method)ibuffer_name, "set", A_GIMME, 0);
-	class_addmethod(this_class, (method)ibuffer_load, "open", A_GIMME, 0);
-	class_addmethod(this_class, (method)ibuffer_load, "replace", A_GIMME, 0);
-	class_addmethod(this_class, (method)ibuffer_valid, "valid", A_CANT, 0);
-	class_addmethod(this_class, (method)ibuffer_assist, "assist", A_CANT, 0);
+    this_class = class_new ("ibuffer~", (method) ibuffer_new, (method)ibuffer_free, (short)sizeof(t_ibuffer), 0L, A_DEFSYM, A_DEFSYM, 0);
+    
+    class_addmethod(this_class, (method)ibuffer_name, "name", A_GIMME, 0);
+    class_addmethod(this_class, (method)ibuffer_name, "set", A_GIMME, 0);
+    class_addmethod(this_class, (method)ibuffer_load, "open", A_GIMME, 0);
+    class_addmethod(this_class, (method)ibuffer_load, "replace", A_GIMME, 0);
+    class_addmethod(this_class, (method)ibuffer_valid, "valid", A_CANT, 0);
+    class_addmethod(this_class, (method)ibuffer_assist, "assist", A_CANT, 0);
     class_addmethod(this_class, (method)ibuffer_rawload, "raw", A_GIMME, 0);
-	
-	class_dspinit(this_class);
-	class_register(CLASS_BOX, this_class);
-	
-	ps_null = gensym("");
-	
-	return 0;
+    
+    class_dspinit(this_class);
+    class_register(CLASS_BOX, this_class);
+    
+    ps_null = gensym("");
+    
+    return 0;
 }
 
 void *ibuffer_new(t_symbol *name, t_symbol *path_sym)
 {
-	t_atom temp_atom;
+    t_atom temp_atom;
     post("You are using the custom version of ibuffer~");
     t_ibuffer *x = (t_ibuffer *) object_alloc(this_class);
-	
-	dsp_setup((t_pxobject *)x, 0);
-	x->name = 0;
-	x->valid = 1;
-	x->thebuffer = NULL;
+    
+    dsp_setup((t_pxobject *)x, 0);
+    x->name = 0;
+    x->valid = 1;
+    x->thebuffer = NULL;
     x->samples = NULL;
-	x->frames = 0;
+    x->frames = 0;
     x->channels = 1;
     x->format = PCM_INT_16;
-	x->sr = 44100;
-	x->inuse = 0;
-	
-	x->bang_out = bangout(x);
-	
-	if (name && name != ps_null) 
-	{
-		atom_setsym(&temp_atom, name);
-		ibuffer_name(x, 0, 1, &temp_atom);
-	}
-	
-	if (path_sym && path_sym != ps_null) 
-	{
-		atom_setsym(&temp_atom, path_sym);
-		ibuffer_load(x, 0, 1, &temp_atom);
-	}
-	
+    x->sr = 44100;
+    x->inuse = 0;
+    
+    x->bang_out = bangout(x);
+    
+    if (name && name != ps_null)
+    {
+        atom_setsym(&temp_atom, name);
+        ibuffer_name(x, 0, 1, &temp_atom);
+    }
+    
+    if (path_sym && path_sym != ps_null)
+    {
+        atom_setsym(&temp_atom, path_sym);
+        ibuffer_load(x, 0, 1, &temp_atom);
+    }
+    
     return (x);
 }
 
 void ibuffer_free(t_ibuffer *x)
 {
-	x->valid = 0;
-	
-	dsp_free(&x->x_obj);
-	free(x->thebuffer);
-	
-	if (x->name) 
-		x->name->s_thing = 0;
+    x->valid = 0;
+    
+    dsp_free(&x->x_obj);
+    free(x->thebuffer);
+    
+    if (x->name)
+        x->name->s_thing = 0;
 }
 
 void ibuffer_assist(t_ibuffer *x, void *b, long m, long a, char *s)
 {
-    if (m == ASSIST_OUTLET) 
-		sprintf(s,"(bang) Buffer Loaded");
-    else 
-		sprintf(s,"File Operations");
+    if (m == ASSIST_OUTLET)
+        sprintf(s,"(bang) Buffer Loaded");
+    else
+        sprintf(s,"File Operations");
 }
 
 void ibuffer_name(t_ibuffer *x, t_symbol *s, short argc, t_atom *argv)
 {
-	// Send name of buffer as the calling symbol
-	
-	if (argc)
-		defer(x, (method) ibuffer_name_internal, atom_getsym(argv), 0, 0);
+    // Send name of buffer as the calling symbol
+    
+    if (argc)
+        defer(x, (method) ibuffer_name_internal, atom_getsym(argv), 0, 0);
 }
 
 void ibuffer_name_internal(t_ibuffer *x, t_symbol *name, short argc, t_atom *argv)
-{	
-	if (!name || name == ps_null || name == x->name) 
-		return;
-	
-	if (name->s_thing)
-		object_error((t_object *) x, "ibuffer~: name %s already in use!", name->s_name);
-	else
-	{
-		if (x->name) 
-			x->name->s_thing = 0;
-		name->s_thing = (t_object *) x;
-		x->name = name;
-	}
+{
+    if (!name || name == ps_null || name == x->name)
+        return;
+    
+    if (name->s_thing)
+        object_error((t_object *) x, "ibuffer~: name %s already in use!", name->s_name);
+    else
+    {
+        if (x->name)
+            x->name->s_thing = 0;
+        name->s_thing = (t_object *) x;
+        x->name = name;
+    }
 }
 
 void *ibuffer_valid(t_ibuffer *x)
-{	
-	return (void *) &x->valid;
+{
+    return (void *) &x->valid;
 }
 
 void ibuffer_load(t_ibuffer *x, t_symbol *s, short argc, t_atom *argv)
 {
-	if (argc)
-		defer(x, (method) ibuffer_doload, s, argc, argv);
+    if (argc)
+        defer(x, (method) ibuffer_doload, s, argc, argv);
 }
 
 void ibuffer_rawload(t_ibuffer *x, t_symbol *s, short argc, t_atom *argv)
@@ -144,7 +144,7 @@ struct ibuffer_lock
     ibuffer_lock(t_ibuffer *x, HISSTools::Utility::IAudioFile *file) : m_ibuffer(x), m_file(file)
     {
         // Set invalid and wait till we can become the only user
-
+        
         while (!ATOMIC_COMPARE_SWAP32(1, 0, &x->valid));
         while (!ATOMIC_COMPARE_SWAP32(0, 1, &x->inuse));
     }
@@ -181,7 +181,7 @@ void form_os_name(char *filename, char *foldname, char *fullname)
     char *name_ptr = foldname;
     long offset;
     long colon = 0;
-
+    
     // Start with the root '/Volumes/'
     
     strcpy(fullname, "/Volumes/");
@@ -198,7 +198,7 @@ void form_os_name(char *filename, char *foldname, char *fullname)
         if (*name_ptr && colon != 1)
             fullname[offset++] = *name_ptr;
     }
-
+    
     // Add a slash seperator and then copy the file name
     
     fullname[offset++] = '/';
@@ -208,9 +208,9 @@ void form_os_name(char *filename, char *foldname, char *fullname)
 void form_os_name(char *filename, char *foldname, char *fullname)
 {
     long offset = strlen(foldname);;
-
+    
     // Copy folder name, add a slash seperator and then copy the file name
-
+    
     strcpy(fullname, foldname);
     fullname[offset++] = '/';
     strcpy(fullname + offset, filename);
@@ -220,7 +220,7 @@ void form_os_name(char *filename, char *foldname, char *fullname)
 void ibuffer_switch_endianness(t_ibuffer *x)
 {
     UInt8 *data = (UInt8 *)x->samples;
-            
+    
     if (x->format == PCM_INT_16)
     {
         for (t_ptr_int i = 0; i < x->frames * x->channels; i++, data += 2)
@@ -247,68 +247,68 @@ void ibuffer_dorawload(t_ibuffer *x, t_symbol *s, short argc, t_atom *argv)
 {
     HISSTools::Utility::IAudioFile file;
     
-	// Get path
-
-	if (argc)
-	{
+    // Get path
+    
+    if (argc)
+    {
         char filename[2048];
         char foldname[2048];
         char fullname[2048];
-
+        
         char null_char = 0;
-
+        
         short path = 0;
         t_fourcc type = 0;
-
-		// Find the file and get the correct filename ss well as that of the enclosing folder (making sure the later is in slash style)
-		
-		strcpy(filename, atom_getsym(argv++)->s_name);
+        
+        // Find the file and get the correct filename ss well as that of the enclosing folder (making sure the later is in slash style)
+        
+        strcpy(filename, atom_getsym(argv++)->s_name);
         argc--;
         
-		short err = locatefile_extended(filename, &path , &type, &type,-1);
-		err |= path_topathname(path, &null_char, foldname);
-		err |= path_nameconform(foldname, fullname, PATH_STYLE_NATIVE, PATH_TYPE_ABSOLUTE);
-		
-		// If we now how a valid filename and folder name copy the strings into a fullname in the correct format and try to open the file
-
-		if (!err)
-		{
+        short err = locatefile_extended(filename, &path , &type, &type,-1);
+        err |= path_topathname(path, &null_char, foldname);
+        err |= path_nameconform(foldname, fullname, PATH_STYLE_NATIVE, PATH_TYPE_ABSOLUTE);
+        
+        // If we now how a valid filename and folder name copy the strings into a fullname in the correct format and try to open the file
+        
+        if (!err)
+        {
             form_os_name(filename, foldname, fullname);
             file.openRaw(fullname);
         }
-	}
+    }
     
     // Lock the ibuffer (automatically releases on return)
-
+    
     ibuffer_lock lock(x, &file);
     
-	if (file.isOpen())
-	{
+    if (file.isOpen())
+    {
         // Load the format data and if we have a valid format load the sample
-
+        
         x->frames = file.getFrames();
         std::cout << x->frames << "\n";
         long num_chans_to_load = x->channels; // Will always be 1 anyway
         long sample_size = file.getByteDepth();
         
         
-		free(x->thebuffer);
-		x->thebuffer = calloc(sample_size, (x->frames * num_chans_to_load + 64));
-		x->samples = (void *)((char *) x->thebuffer + (16 * sample_size));
+        free(x->thebuffer);
+        x->thebuffer = calloc(sample_size, (x->frames * num_chans_to_load + 64));
+        x->samples = (void *)((char *) x->thebuffer + (16 * sample_size));
         
-		// Bail if no memory
-		
-		if (!x->thebuffer)
-		{
-			object_error((t_object *) x, "ibuffer~: could not allocate memory to load file");
+        // Bail if no memory
+        
+        if (!x->thebuffer)
+        {
+            object_error((t_object *) x, "ibuffer~: could not allocate memory to load file");
             return;
-		}
-		
-		// Load the audio data raw and close the file
+        }
+        
+        // Load the audio data raw and close the file
         file.readRaw(x->samples, x->frames);
-		
+        
         lock.destroy();
-		outlet_bang(x->bang_out);
+        outlet_bang(x->bang_out);
     }
 }
 
@@ -456,3 +456,4 @@ void ibuffer_doload(t_ibuffer *x, t_symbol *s, short argc, t_atom *argv)
         object_error((t_object *) x, "ibuffer~: could not find / open named file");
     }
 }
+
