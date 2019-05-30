@@ -22,6 +22,7 @@
 
 #include <limits>
 #include <algorithm>
+#include <iostream>
 
 t_class *this_class;
 
@@ -378,7 +379,6 @@ void perform_core(t_ibufplayer *x, T *in, T **outs, T *phase_out, double *positi
     ibuffer_data buffer(x->buffer_name);
     
     // Check on playback state / new play instruction and decide whether to output
-    
     if (buffer.get_length())
     {
         double speed = x->speed * buffer.get_sample_rate() * x->sr_div;

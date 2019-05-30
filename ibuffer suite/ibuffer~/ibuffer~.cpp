@@ -36,6 +36,7 @@ int C74_EXPORT main()
     class_addmethod(this_class, (method)ibuffer_valid, "valid", A_CANT, 0);
     class_addmethod(this_class, (method)ibuffer_assist, "assist", A_CANT, 0);
     class_addmethod(this_class, (method)ibuffer_rawload, "raw", A_GIMME, 0);
+//    class_addmethod(this_class, (method)ibuffer_write, "write", A_GIMME, 0);
     
     class_dspinit(this_class);
     class_register(CLASS_BOX, this_class);
@@ -48,7 +49,6 @@ int C74_EXPORT main()
 void *ibuffer_new(t_symbol *name, t_symbol *path_sym)
 {
     t_atom temp_atom;
-    post("You are using the custom version of ibuffer~");
     t_ibuffer *x = (t_ibuffer *) object_alloc(this_class);
     
     dsp_setup((t_pxobject *)x, 0);
@@ -61,7 +61,6 @@ void *ibuffer_new(t_symbol *name, t_symbol *path_sym)
     x->format = PCM_INT_16;
     x->sr = 44100;
     x->inuse = 0;
-    
     x->bang_out = bangout(x);
     
     if (name && name != ps_null)
@@ -287,14 +286,16 @@ void ibuffer_dorawload(t_ibuffer *x, t_symbol *s, short argc, t_atom *argv)
         // Load the format data and if we have a valid format load the sample
         
         x->frames = file.getFrames();
-        std::cout << x->frames << "\n";
-        long num_chans_to_load = x->channels; // Will always be 1 anyway
+        std::cout << "Number of frames: " << x->frames << "\n";
+        long num_chans_to_load = 1;
         long sample_size = file.getByteDepth();
         
         
         free(x->thebuffer);
-        x->thebuffer = calloc(sample_size, (x->frames * num_chans_to_load + 64));
-        x->samples = (void *)((char *) x->thebuffer + (16 * sample_size));
+        x->thebuffer = calloc(sample_size, (x->frames * num_chans_to_load + 0));
+        x->samples = (void *)((char *) x->thebuffer + (4 * sample_size));
+        std::cout << "Number of Samples: " << x->samples << "\n";
+        
         
         // Bail if no memory
         

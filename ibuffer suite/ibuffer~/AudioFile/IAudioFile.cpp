@@ -446,7 +446,6 @@ namespace HISSTools
             setFileType(kAudioFileWAVE);
             std::cout << "\n";
             std::cout << "\n";
-            
             std::cout << "Frames:" << getFrames() << "\n";
             std::cout << "FrameByteCount:" << getFrameByteCount() << "\n";
             std::cout << "Sample Rate:" << getSamplingRate() << "\n";
